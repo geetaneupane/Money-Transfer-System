@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 from app.models.accounts import Account
 from app.repositories.account_repository import create_account
 from app.schemas.account import AccountCreate
+from app.repositories.account_repository import get_account_by_id
 
 
 def create_new_account(
@@ -16,3 +17,12 @@ def create_new_account(
     )
 
     return create_account(session, account)
+
+
+
+#for GET /users/{id} feature:
+def get_account(
+    session: Session,
+    account_id: int,
+) -> Account | None:
+    return get_account_by_id(session, account_id)

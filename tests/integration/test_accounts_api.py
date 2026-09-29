@@ -39,3 +39,35 @@ def test_create_account() -> None:
         session.commit()
     finally:
         session.close()
+
+
+#for testing get_account:
+def test_get_account() -> None:
+    create_response = client.post(
+        "/accounts",
+        json={
+            "owner_name": "Get Test",
+            "currency": "USD",
+            "initial_balance_minor": 15000,
+        },
+    )
+
+    account_id = create_response.json()["id"]
+
+    response = client.get(f"/accounts/{account_id}")
+
+    assert response.status_code == 200
+    assert response.json()["id"] == account_id
+    assert response.json()["owner_name"] == "Get Test"
+    assert response.json()["balance_minor"] == 15000
+
+    session = SessionLocal()
+
+    try:
+        account = session.get(Account, account_id)
+
+        if account is not None:
+            session.delete(account)
+            session.commit()
+    finally:
+        session.close()
