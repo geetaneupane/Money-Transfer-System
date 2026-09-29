@@ -12,11 +12,7 @@ def test_create_and_get_account() -> None:
     session = SessionLocal()
 
     try:
-        account = Account(
-            owner_name="Repository Test",
-            currency="USD",
-            balance_minor=5000,
-        )
+        account = Account(owner_name="Repository Test", currency="USD", balance_minor=5000)
 
         created_account = create_account(session, account)
         found_account = get_account_by_id(session, created_account.id)
