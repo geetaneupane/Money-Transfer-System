@@ -46,10 +46,10 @@ uv sync
 Create a local `.env` file:
 
 ```env
-DATABASE_URL=postgresql+psycopg://money_user:money_password@localhost:5434/money_transfer
+DATABASE_URL=postgresql+psycopg://<username>:<password>@<host>:<port>/<database_name>
 ```
 
-Do not commit `.env`. Use `.env.example` as a reference.
+
 
 ## Start PostgreSQL
 
@@ -67,12 +67,72 @@ uv run alembic upgrade head
 uv run alembic current
 ```
 
-Main tables:
+## Database Schema
 
-- `accounts`
-- `transfers`
-- `transactions`
+### `accounts`
 
+Stores account balances.
+
+| Column | Description |
+|---|---|
+| `id` | Primary key |
+| `owner_name` | Account owner name |
+| `currency` | Three-letter currency code |
+| `balance_minor` | Balance stored in integer minor units |
+| `created_at` | Account creation timestamp |
+
+Constraints:
+
+- `id` is the primary key.
+- `balance_minor` cannot be negative.
+
+### `transfers`
+
+Stores transfer operations.
+
+| Column | Description |
+|---|---|
+| `id` | Primary key |
+| `source_account_id` | Foreign key to `accounts.id` |
+| `destination_account_id` | Foreign key to `accounts.id` |
+| `amount_minor` | Transfer amount in minor units |
+| `currency` | Transfer currency |
+| `idempotency_key` | Unique request key |
+| `status` | Transfer status |
+| `created_at` | Transfer creation timestamp |
+
+Constraints and indexes:
+
+- `id` is the primary key.
+- `source_account_id` references `accounts.id`.
+- `destination_account_id` references `accounts.id`.
+- `idempotency_key` is unique.
+- Account ID columns are indexed.
+
+### `transactions`
+
+Stores the ledger entries produced by transfers.
+
+| Column | Description |
+|---|---|
+| `id` | Primary key |
+| `account_id` | Foreign key to `accounts.id` |
+| `transfer_id` | Foreign key to `transfers.id` |
+| `transaction_type` | `debit` or `credit` |
+| `amount_minor` | Transaction amount in minor units |
+| `balance_after` | Account balance after the transaction |
+| `created_at` | Transaction creation timestamp |
+
+Constraints and indexes:
+
+- `id` is the primary key.
+- `account_id` references `accounts.id`.
+- `transfer_id` references `transfers.id`.
+- `account_id` and `created_at` are indexed.
+
+### `alembic_version`
+
+Internal Alembic table used to track the latest applied migration. It is not part of the money-transfer business domain.
 ## Start the API
 
 ```powershell
