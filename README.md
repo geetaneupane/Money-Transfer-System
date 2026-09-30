@@ -281,7 +281,7 @@ uv run pytest
 
 The implementation prioritized:
 
--**Atomic transfers** - Balance updates, transfer records, and ledger entries are committed together so partial transfers cannot occur.
+- **Atomic transfers** - Balance updates, transfer records, and ledger entries are committed together so partial transfers cannot occur.
 - **Integer-based money representation** - Money is stored in minor units to avoid floating-point rounding errors.
 - **Row-level locking** - `SELECT FOR UPDATE` prevents concurrent requests from overspending an account.
 - **Negative-balance prevention** - Application validation and database constraints prevent invalid balances.
@@ -296,9 +296,9 @@ The implementation prioritized:
 ## Skipped Work
 
 The following were intentionally skipped to keep the work appropriately scoped:
--**Refunds and transfer reversals** - They require additional transfer states and accounting rules.
--**Multi-currency exchange** - Exchange rates and conversion logic are outside the assignment scope.
--**Cursor-based pagination** - Limit-offset pagination was sufficient and simpler for this project.
+- **Refunds and transfer reversals** - They require additional transfer states and accounting rules.
+- **Multi-currency exchange** - Exchange rates and conversion logic are outside the assignment scope.
+- **Cursor-based pagination** - Limit-offset pagination was sufficient and simpler for this project.
 - **Unified error-response envelopes** - HTTP status codes and useful error details are implemented; a common error schema would be a future improvement.
 
 ## Trade-offs and Future Improvements
