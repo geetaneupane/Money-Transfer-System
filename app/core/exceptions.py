@@ -8,3 +8,6 @@ class InsufficientFundsError(Exception):
 
 class InvalidTransferError(Exception):
     pass
+
+class IdempotencyConflictError(Exception):
+    pass

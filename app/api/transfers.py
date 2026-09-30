@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, Header, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import (AccountNotFoundError,InsufficientFundsError,InvalidTransferError)
+from app.core.exceptions import (AccountNotFoundError,InsufficientFundsError,InvalidTransferError,IdempotencyConflictError)
 from app.db.dependencies import get_db
 from app.schemas.transfer import TransferCreate, TransferResponse
 from app.services.transfer_service import create_transfer
-
 
 router = APIRouter(
     prefix="/transfers",
@@ -35,6 +34,11 @@ def create_transfer_endpoint(
             detail=str(error),
         ) from error
     except InsufficientFundsError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+    except IdempotencyConflictError as error:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail=str(error),

@@ -4,7 +4,6 @@ from app.db.session import SessionLocal
 from app.main import app
 from app.models.accounts import Account
 
-
 client = TestClient(app)
 
 

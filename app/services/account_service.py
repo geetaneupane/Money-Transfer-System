@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Session
 
 from app.models.accounts import Account
-from app.repositories.account_repository import create_account
+from app.repositories.account_repository import create_account, get_account_by_id
 from app.schemas.account import AccountCreate
-from app.repositories.account_repository import get_account_by_id
 
 
 def create_new_account(

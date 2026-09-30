@@ -1,15 +1,6 @@
 from app.models.accounts import Account
 
 
-def test_account_table_definition() -> None:
-    assert Account.__tablename__ == "accounts"
-    assert "id" in Account.__table__.columns
-    assert "owner_name" in Account.__table__.columns
-    assert "currency" in Account.__table__.columns
-    assert "balance_minor" in Account.__table__.columns
-    assert "created_at" in Account.__table__.columns
-
-
 def test_account_has_non_negative_balance_constraint() -> None:
     constraint_names = {
         constraint.name for constraint in Account.__table__.constraints

@@ -6,7 +6,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 
 
-
 #Added Database indexes on account_id and created_at. 
 class Transaction(Base):
     __tablename__ = "transactions"

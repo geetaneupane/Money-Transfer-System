@@ -1,12 +1,12 @@
-from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-from app.core.exceptions import ( AccountNotFoundError, InsufficientFundsError, InvalidTransferError)
+from app.core.exceptions import (AccountNotFoundError,InsufficientFundsError,InvalidTransferError,IdempotencyConflictError)
 from app.models.transaction import Transaction
 from app.models.transfer import Transfer
 from app.repositories.account_repository import get_accounts_for_update
+from app.repositories.transfer_repository import get_transfer_by_idempotency_key
 from app.schemas.transfer import TransferCreate
-from app.repositories.transfer_repository import (get_transfer_by_idempotency_key)
 
 
 def create_transfer(session: Session,transfer_data: TransferCreate,idempotency_key: str) -> Transfer:
@@ -16,6 +16,20 @@ def create_transfer(session: Session,transfer_data: TransferCreate,idempotency_k
     )
 
     if existing_transfer is not None:
+        same_request = (
+            existing_transfer.source_account_id
+            == transfer_data.source_account_id
+            and existing_transfer.destination_account_id
+            == transfer_data.destination_account_id
+            and existing_transfer.amount_minor
+            == transfer_data.amount_minor
+        )
+
+        if not same_request:
+            raise IdempotencyConflictError(
+                "Idempotency key was already used for another transfer"
+            )
+    
         return existing_transfer
 
     if (

@@ -1,4 +1,3 @@
-from sqlalchemy import delete
 
 from app.db.session import SessionLocal
 from app.models.accounts import Account

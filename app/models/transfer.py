@@ -5,7 +5,6 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base
 
-
 #database indexes added on source_account_id and destination_account_id
 
 class Transfer(Base):

@@ -1,8 +1,7 @@
 from fastapi import FastAPI
 
-
 from app.api.accounts import router as accounts_router
-from app.api.transfers import router as transfers_router  
+from app.api.transfers import router as transfers_router
 
 app=FastAPI(
     title="Money Transfer System",

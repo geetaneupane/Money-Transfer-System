@@ -1,14 +1,11 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
-from fastapi import Query
+
 from app.db.dependencies import get_db
-from app.schemas.account import AccountCreate, AccountResponse
-from app.services.account_service import create_new_account, get_account
-from fastapi import APIRouter, Depends, HTTPException, status
 from app.repositories.transaction_repository import get_account_transactions
+from app.schemas.account import AccountCreate, AccountResponse
 from app.schemas.transaction import TransactionHistoryResponse
-
-
+from app.services.account_service import create_new_account, get_account
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
 
