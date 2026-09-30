@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
-
+from fastapi import Query
 from app.db.dependencies import get_db
 from app.schemas.account import AccountCreate, AccountResponse
 from app.services.account_service import create_new_account, get_account
 from fastapi import APIRouter, Depends, HTTPException, status
+from app.repositories.transaction_repository import get_account_transactions
+from app.schemas.transaction import TransactionHistoryResponse
+
 
 
 router = APIRouter(prefix="/accounts", tags=["accounts"])
@@ -35,3 +38,36 @@ def get_account_details(
         )
 
     return account
+
+
+
+#for GET /accounts/{account_id}/transactions?page=2&page_size=20
+@router.get(
+    "/{account_id}/transactions",
+    response_model=TransactionHistoryResponse,
+)
+def get_transactions(
+    account_id: int,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(20, ge=1, le=100),
+    session: Session = Depends(get_db),
+) -> TransactionHistoryResponse:
+    if get_account(session, account_id) is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Account not found",
+        )
+
+    items, total = get_account_transactions(
+        session,
+        account_id,
+        page,
+        page_size,
+    )
+
+    return TransactionHistoryResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )

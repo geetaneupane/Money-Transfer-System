@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from collections.abc import Sequence
 
 from app.models.accounts import Account
 
@@ -25,3 +26,20 @@ def get_account_by_id(
     statement=select(Account).where(Account.id==account_id)
     return session.scalar(statement)
 
+#writing equivalent raw SQL query for obtaining row level lock on certain row, RAW SQLko FOR UPDATE jastai use gareko:
+def get_accounts_for_update(
+    session: Session,
+    account_ids: Sequence[int],
+) -> dict[int, Account | None]:
+    locked_accounts: dict[int, Account | None] = {}
+
+    for account_id in sorted(set(account_ids)):
+        statement = (
+            select(Account)
+            .where(Account.id == account_id)
+            .with_for_update()
+        )
+
+        locked_accounts[account_id] = session.scalar(statement)
+
+    return locked_accounts
