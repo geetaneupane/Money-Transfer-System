@@ -281,24 +281,25 @@ uv run pytest
 
 The implementation prioritized:
 
-- Correct atomic transfers
-- Safe integer-based money representation
-- Row-level locking and concurrency safety
-- Negative-balance prevention
-- Idempotency
-- Debit and credit ledger entries
-- Transaction-history pagination
-- Database migrations
-- Docker PostgreSQL
-- Unit, integration, and concurrency tests
-- Clear API, service, repository, and model separation
+-**Atomic transfers** - Balance updates, transfer records, and ledger entries are committed together so partial transfers cannot occur.
+- **Integer-based money representation** - Money is stored in minor units to avoid floating-point rounding errors.
+- **Row-level locking** - `SELECT FOR UPDATE` prevents concurrent requests from overspending an account.
+- **Negative-balance prevention** - Application validation and database constraints prevent invalid balances.
+- **Idempotency** - Retry requests do not transfer money more than once.
+- **Debit and credit ledger entries** - Each transfer records both sides of the money movement for auditing.
+- **Transaction-history pagination** - Limit-offset pagination keeps the API simple while satisfying the history requirement.
+- **Database migrations** - Alembic makes schema changes reproducible.
+- **Docker PostgreSQL** - Docker provides a consistent local database environment.
+- **Automated tests** - Unit, integration, API, and concurrency tests verify success and failure cases.
+- **Layered architecture** - API, service, repository, schema, and model responsibilities remain separated.
 
 ## Skipped Work
 
 The following were intentionally skipped to keep the work appropriately scoped:
-- Refunds and transfer reversals
-- Multi-currency exchange
-- Cursor-based pagination
+-**Refunds and transfer reversals** - They require additional transfer states and accounting rules.
+-**Multi-currency exchange** - Exchange rates and conversion logic are outside the assignment scope.
+-**Cursor-based pagination** - Limit-offset pagination was sufficient and simpler for this project.
+- **Unified error-response envelopes** - HTTP status codes and useful error details are implemented; a common error schema would be a future improvement.
 
 ## Trade-offs and Future Improvements
 
@@ -312,4 +313,4 @@ With more time, I would add a shared error-response schema and global exception 
 
 ## License
 
-This project was created as part of Backend Engineering Assignment.
+This project was created as part of Insyde.ai Backend Engineering Assignment.
