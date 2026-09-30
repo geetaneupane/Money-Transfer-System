@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 
 from app.core.exceptions import ( AccountNotFoundError, InsufficientFundsError, InvalidTransferError)
 from app.models.transaction import Transaction
@@ -57,28 +58,42 @@ def create_transfer(session: Session,transfer_data: TransferCreate,idempotency_k
     )
 
     session.add(transfer)
-    session.flush()
+    try:
+        session.flush()
 
-    session.add_all(
-        [
-            Transaction(
-                account_id=source_account.id,
-                transfer_id=transfer.id,
-                transaction_type="debit",
-                amount_minor=transfer_data.amount_minor,
-                balance_after=source_account.balance_minor,
-            ),
-            Transaction(
-                account_id=destination_account.id,
-                transfer_id=transfer.id,
-                transaction_type="credit",
-                amount_minor=transfer_data.amount_minor,
-                balance_after=destination_account.balance_minor,
-            ),
-        ]
-    )
+        session.add_all(
+            [
+                Transaction(
+                    account_id=source_account.id,
+                    transfer_id=transfer.id,
+                    transaction_type="debit",
+                    amount_minor=transfer_data.amount_minor,
+                    balance_after=source_account.balance_minor,
+                ),
+                Transaction(
+                    account_id=destination_account.id,
+                    transfer_id=transfer.id,
+                    transaction_type="credit",
+                    amount_minor=transfer_data.amount_minor,
+                    balance_after=destination_account.balance_minor,
+                ),
+            ]
+        )
 
-    session.commit()
+        session.commit()
+    except IntegrityError:
+        session.rollback()
+    
+        existing_transfer = get_transfer_by_idempotency_key(
+            session,
+            idempotency_key,
+        )
+    
+        if existing_transfer is not None:
+            return existing_transfer
+
+        raise
+
     session.refresh(transfer)
 
     return transfer

@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 
 
+
+#Added Database indexes on account_id and created_at. 
 class Transaction(Base):
     __tablename__ = "transactions"
 
@@ -13,6 +15,7 @@ class Transaction(Base):
     account_id: Mapped[int] = mapped_column(
         ForeignKey("accounts.id"),
         nullable=False,
+        index=True     #adding index for account_id in transaction table. 
     )
     transfer_id: Mapped[int] = mapped_column(
         ForeignKey("transfers.id"),
@@ -33,4 +36,5 @@ class Transaction(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
+        index=True 
     )

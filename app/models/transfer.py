@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.db.base import Base
 
 
+#database indexes added on source_account_id and destination_account_id
+
 class Transfer(Base):
     __tablename__ = "transfers"
 
@@ -21,10 +23,12 @@ class Transfer(Base):
     source_account_id: Mapped[int] = mapped_column(
         ForeignKey("accounts.id"),
         nullable=False,
+        index=True
     )
     destination_account_id: Mapped[int] = mapped_column(
         ForeignKey("accounts.id"),
         nullable=False,
+        index=True
     )
     amount_minor: Mapped[int] = mapped_column(Integer, nullable=False)
     currency: Mapped[str] = mapped_column(String(length=3), nullable=False)

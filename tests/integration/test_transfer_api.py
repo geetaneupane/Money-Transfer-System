@@ -72,3 +72,16 @@ def test_repeated_transfer_request_returns_same_transfer() -> None:
         assert destination_account.balance_minor == 4000
     finally:
         session.close()
+
+
+def test_transfer_requires_idempotency_key()-> None:
+    response=client.post(
+        "/transfers",
+        json={
+            "source_account_id": 1,
+            "destination_account_id":2,
+            "amount_minor": 100,
+        },
+    )
+
+    assert response.status_code==422

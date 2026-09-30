@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class TransactionResponse(BaseModel):
@@ -11,6 +11,8 @@ class TransactionResponse(BaseModel):
     amount_minor: int
     balance_after: int
     created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
 
 #schema for getting transaction history and pagination
 class TransactionHistoryResponse(BaseModel):
